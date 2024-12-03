@@ -1,5 +1,6 @@
 package game2048;
 
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Observable;
 
@@ -109,16 +110,63 @@ public class Model extends Observable {
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
-
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+
+        board.setViewingPerspective(side);
+
+        for(int col = 0; col < board.size(); col++){
+            if( checkcol(col) ){
+                changed = true;
+            }
+        }
+
+        board.setViewingPerspective(Side.NORTH);
 
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+    /** 传入需要移动的列
+     *  枚举每个位置如何移动 1.空位置 不移动
+     *                   2.非空   检测上面是否有非空块
+     */
+    public boolean checkcol(int col){
+        boolean ans = false;
+        int n = board.size();
+        boolean[] canmerge = new boolean[n];
+        Arrays.fill(canmerge, true);
+        for (int row = n - 2; row >= 0; row--) {
+            Tile t = board.tile(col, row);
+            if (t == null) {
+                continue;
+            }else{
+                if( board.tile(col,n - 1) == null ) {
+                    board.move(col, n - 1, t);
+                    ans = true;
+                    continue;
+                }
+                for (int i = row + 1; i < n; i++) {
+                    Tile s = board.tile(col, i);
+                    if( s == null ) continue;
+                    if( s.value() == t.value() && canmerge[i] ){
+                        board.move(col, i, t);
+                        this.score += s.value() * 2;
+                        canmerge[i] = false;
+                        ans = true;
+                    } else {
+                        board.move(col, i - 1, t);
+                        ans = true;
+                    }
+                    break;
+                }
+            }
+        }
+        return ans;
     }
 
     /** Checks if the game is over and sets the gameOver variable
@@ -138,6 +186,14 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        int n = b.size();
+        for(int col = 0; col < n; col++) {
+            for(int row = 0; row < n; row++) {
+                if( b.tile(col,row) == null ){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -148,6 +204,15 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        int n = b.size();
+        for(int col = 0; col < n; col++) {
+            for(int row = 0; row < n; row++) {
+                Tile now = b.tile(col,row);
+                if( now != null && now.value() == MAX_PIECE ){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -159,6 +224,21 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        int n = b.size();
+        for(int col = 0; col < n; col++) {
+            for(int row = 0; row < n;row++){
+                Tile now = b.tile(col,row);
+                if( now == null ) return true;
+                if( col + 1 < n ){
+                    Tile nowrighht = b.tile(col+1,row);
+                    if( nowrighht != null && nowrighht.value() == now.value() ) return true;
+                }
+                if( row + 1 < n ) {
+                    Tile nowlift = b.tile(col, row + 1);
+                    if (nowlift != null && nowlift.value() == now.value()) return true;
+                }
+            }
+        }
         return false;
     }
 
