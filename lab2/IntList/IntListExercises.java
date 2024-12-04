@@ -73,7 +73,7 @@ public class IntListExercises {
         boolean ans = false;
         while (p != null) {
             if (Primes.isPrime(p.first)) {
-                lst.first *= lst.first;
+                p.first *= p.first;
                 ans = true;
             }
             p = p.rest;

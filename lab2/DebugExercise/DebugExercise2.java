@@ -14,7 +14,7 @@ public class DebugExercise2 {
 //
 //        int max = b & w | a & z;
 //        return max;
-        return (a > b) ? a : b;
+        return Math.max(a, b);
     }
 
 
