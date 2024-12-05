@@ -42,7 +42,7 @@ public class TimeSLList {
             testSllist.addLast(0);
             if (i == Ns.get(Nsindex)) {
                 Stopwatch sw = new Stopwatch();
-                for (int j = 0; j < 100000; j++) {
+                for (int j = 0; j < 10000; j++) {
                     testSllist.getLast();
                 }
                 double timeInSeconds = sw.elapsedTime();
